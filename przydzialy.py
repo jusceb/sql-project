@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-# Justyna Cebrat 374722
 
 import sqlite3
 import collections
 import numpy as np
 
-def dh(mandaty,listy, glosy, gl_w, wszystkie):
+def dh(mandaty, listy, glosy, gl_w, wszystkie):
     prog1 = 0.05 * wszystkie
     prog2 = 0.08 * wszystkie
     man = dict()
@@ -23,10 +22,10 @@ def dh(mandaty,listy, glosy, gl_w, wszystkie):
         if listy[i] == 16:
                 listy_d.append(listy[i])
                 glosy_d.append(glosy[i])
-    for j in range(1,mandaty+1):
+    for j in range(1, mandaty + 1):
         for i in range(len(glosy_d)):
              man[glosy_d[i] / j] = listy_d[i]            
-    sorted_man = sorted(man.items(), key=lambda kv: kv[0], reverse=True)
+    sorted_man = sorted(man.items(), key=lambda kv: kv[0], reverse = True)
     wynik = sorted_man[:mandaty]
     lis = []
     for i in wynik:
@@ -44,8 +43,8 @@ def hn(glosy, mandaty, wszystkie):
     wyniki = []
     reszta = []
     for i in range(len(glosy)):
-        wyniki.append(int((glosy[i]*mandaty)/wszystkie))
-        reszta.append(((glosy[i]*mandaty)/wszystkie) - (int((glosy[i]*mandaty)/wszystkie)))
+        wyniki.append(int((glosy[i] * mandaty) / wszystkie))
+        reszta.append(((glosy[i] * mandaty) / wszystkie) - (int((glosy[i] * mandaty) / wszystkie)))
     while sum(wyniki) < mandaty:
         for i in range(len(reszta)):
             naj = max(reszta)
@@ -66,8 +65,9 @@ def get_data(c):
             wszystkie_partia.append(list(i)[0])
         wyniki_dh1 = []
         wyniki_hn1 = []
-        for i in range(1,len(wszystkie_okreg)+1):
-            c.execute('''select w.LICZBA_GŁOSÓW, w.NR_KOMITETU, w.NR_OKRĘGU, o.MANDATY from WYNIKI w join OKRĘGI o on o.NUMER = w.NR_OKRĘGU where NR_OKRĘGU = {} and NR_KOMITETU > 0 group by NR_KOMITETU'''.format(i))
+        for i in range(1,len(wszystkie_okreg) + 1):
+            c.execute('''select w.LICZBA_GŁOSÓW, w.NR_KOMITETU, w.NR_OKRĘGU, o.MANDATY from WYNIKI w join OKRĘGI o 
+                      on o.NUMER = w.NR_OKRĘGU where NR_OKRĘGU = {} and NR_KOMITETU > 0 group by NR_KOMITETU'''.format(i))
             dane = c.fetchall()
             mandaty = list(dane)[0][-1]
             listy = []
@@ -78,13 +78,13 @@ def get_data(c):
             wszystkie_partie_wazne = []
             for j in listy:
                     wszystkie_partie_wazne.append(wszystkie_partia[j-1])
-            wyn_hn = hn(glosy,mandaty,wszystkie_okreg[i-1])
-            wyn_dh,komit = dh(mandaty,listy,glosy,wszystkie_partie_wazne,wszystkie) 
+            wyn_hn = hn(glosy, mandaty, wszystkie_okreg[i-1])
+            wyn_dh,komit = dh(mandaty, listy, glosy,wszystkie_partie_wazne, wszystkie) 
             wyniki_hn = list(np.zeros(len(wszystkie_partia)))
             wyniki_dh = list(np.zeros(len(wszystkie_partia)))
             for j in range(len(wyniki_dh)):
                 for jj in range(len(wyn_dh)):
-                    if wyn_dh[jj] == j+1:
+                    if wyn_dh[jj] == j + 1:
                         wyniki_dh[j] = komit[jj]
             wyniki_dh1.append(wyniki_dh)
             for j in range(len(wyn_hn)):
@@ -113,7 +113,7 @@ if __name__ == '__main__':
         wyniki_dh1, wyniki_hn1, wszystkie_partia = get_data(c)
         for i in range(len(wyniki_dh1)):
             for j in range(len(wszystkie_partia)):
-                 to_przydzialy = [j+1,i+1,int(wyniki_dh1[i][j]),int(wyniki_hn1[i][j])]
+                 to_przydzialy = [j+1, i+1, int(wyniki_dh1[i][j]), int(wyniki_hn1[i][j])]
                  c.executemany('''INSERT OR REPLACE into PRZYDZIAŁY values (?,?,?,?)''', (to_przydzialy,))                 
         n = check(db, 'PRZYDZIAŁY')
-        print('Do tabeli {} zostało wstawionych {} wierszy.'.format('PRZYDZIAŁY',n ))
+        print('Do tabeli {} zostało wstawionych {} wierszy.'.format('PRZYDZIAŁY',n))

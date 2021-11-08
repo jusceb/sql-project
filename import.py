@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# Justyna Cebrat 374722
 
 import sqlite3
 import csv
@@ -41,23 +40,23 @@ def get_rows():
         to_okregi = []
         to_wyniki = []   
         for i in range(5,7):
-            to_komitety.append([line[i].split('\n')[0],i-6])
-        for i in range(7,24):
-            to_komitety.append([line[i].split('-')[1].split('\n')[0],line[i].split('-')[0]])
+            to_komitety.append([line[i].split('\n')[0], i-6])
+        for i in range(7, 24):
+            to_komitety.append([line[i].split('-')[1].split('\n')[0], line[i].split('-')[0]])
         for row in reader:  
             to_okregi.append([int(row[4]), int(row[2]), int(row[0]), row[1]])
-            for i in range(5,7):
-                to_wyniki.append([row[i],i-6,row[0]])
-            for i in range(7,24):
+            for i in range(5, 7):
+                to_wyniki.append([row[i], i-6, row[0]])
+            for i in range(7, 24):
                 if row[i] != '':
-                    to_wyniki.append([row[i],line[i].split('-')[0],row[0]])
+                    to_wyniki.append([row[i], line[i].split('-')[0], row[0]])
         return  to_komitety, to_okregi, to_wyniki
     
-def fill_table(db,table,rows):
+def fill_table(db,table, rows):
     c = db.cursor()
     ddl = TABLES[table]
     ddl = {name:dfn for name, dfn in ddl.items() if not name.lower().startswith('primary ')}
-    sql = ('insert into {} ({}) values ({})'.format(table,",".join(sorted(ddl.keys())),",".join(["?"] * len(ddl))))
+    sql = ('insert into {} ({}) values ({})'.format(table, ",".join(sorted(ddl.keys())), ",".join(["?"] * len(ddl))))
     c.executemany(sql, rows)
     
 def check(db, table):
@@ -75,5 +74,5 @@ if __name__ == '__main__':
             i += 1
         for table in TABLES:
             n = check(db, table)
-            print('Do tabeli {} zostało wstawionych {} wierszy.'.format(table,n ))
+            print('Do tabeli {} zostało wstawionych {} wierszy.'.format(table, n))
 
